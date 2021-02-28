@@ -1,0 +1,35 @@
+{
+  "name": "@openpgp/wkd-client",
+  "version": "0.0.1",
+  "description": "A client for the Web Key Directory (WKD) protocol in order to lookup keys on designated servers.",
+  "main": "src/wkd.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --require esm test/wkd.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openpgpjs/wkd-client.git"
+  },
+  "keywords": [
+    "wkd",
+    "client",
+    "openpgp"
+  ],
+  "author": "Wiktor Kwapisiewicz",
+  "license": "LGPL-3.0+",
+  "bugs": {
+    "url": "https://github.com/openpgpjs/wkd-client/issues"
+  },
+  "homepage": "https://github.com/openpgpjs/wkd-client#readme",
+  "devDependencies": {
+    "chai": "^4.3.0",
+    "esm": "^3.2.25",
+    "mocha": "^8.3.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
+}
