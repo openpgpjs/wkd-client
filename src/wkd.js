@@ -1,4 +1,4 @@
-// OpenPGP.js - An OpenPGP implementation in javascript
+// wkd-client - A WKD client implementation in javascript
 // Copyright (C) 2018 Wiktor Kwapisiewicz
 //
 // This library is free software; you can redistribute it and/or
@@ -15,10 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-import util from './util';
-import crypto from './crypto';
-import { readKeys } from './key';
-
 /**
  * This class implements a client for the Web Key Directory (WKD) protocol
  * in order to lookup keys on designated servers.
@@ -30,15 +26,14 @@ class WKD {
    */
   constructor() {
     this._fetch = typeof globalThis.fetch === 'function' ? globalThis.fetch : require('node-fetch');
+    const { subtle } = globalThis.crypto || require('crypto').webcrypto || new (require('@peculiar/webcrypto').Crypto)();
+    this._subtle = subtle;
   }
 
   /**
    * Search for a public key using Web Key Directory protocol.
    * @param   {String}   options.email         User's email.
-   * @param   {Boolean}  options.rawBytes      Returns Uint8Array instead of parsed key.
-   * @returns {Promise<Uint8Array|
-   *           {keys: Array<Key>,
-   *            err: (Array<Error>|null)}>}     The public key.
+   * @returns {Uint8Array} The public key.
    * @async
    */
   async lookup(options) {
@@ -48,15 +43,17 @@ class WKD {
       throw new Error('You must provide an email parameter!');
     }
 
-    if (!util.isEmailAddress(options.email)) {
+    if (typeof options.email !== 'string' || !options.email.includes('@')) {
       throw new Error('Invalid e-mail address.');
     }
 
-    const [, localPart, domain] = /(.*)@(.*)/.exec(options.email);
-    const localEncoded = util.encodeZBase32(await crypto.hash.sha1(util.strToUint8Array(localPart.toLowerCase())));
+    const [localPart, domain] = options.email.split('@');
+    const localPartEncoded = new TextEncoder().encode(localPart.toLowerCase());
+    const localPartHashed = new Uint8Array(await this._subtle.digest('SHA-1', localPartEncoded));
+    const localPartBase32 = encodeZBase32(localPartHashed);
 
-    const urlAdvanced = `https://openpgpkey.${domain}/.well-known/openpgpkey/${domain}/hu/${localEncoded}`;
-    const urlDirect = `https://${domain}/.well-known/openpgpkey/hu/${localEncoded}`;
+    const urlAdvanced = `https://openpgpkey.${domain}/.well-known/openpgpkey/${domain}/hu/${localPartBase32}`;
+    const urlDirect = `https://${domain}/.well-known/openpgpkey/hu/${localPartBase32}`;
 
     let response;
     try {
@@ -65,19 +62,50 @@ class WKD {
         throw new Error('Advanced WKD lookup failed: ' + response.statusText);
       }
     } catch (err) {
-      util.printDebugError(err);
       response = await fetch(urlDirect);
       if (response.status !== 200) {
         throw new Error('Direct WKD lookup failed: ' + response.statusText);
       }
     }
 
-    const rawBytes = new Uint8Array(await response.arrayBuffer());
-    if (options.rawBytes) {
-      return rawBytes;
-    }
-    return readKeys({ binaryKeys: rawBytes });
+    return new Uint8Array(await response.arrayBuffer());
   }
+}
+
+/**
+ * Encode input buffer using Z-Base32 encoding.
+ * See: https://tools.ietf.org/html/rfc6189#section-5.1.6
+ *
+ * @param {Uint8Array} data - The binary data to encode
+ * @returns {String} Binary data encoded using Z-Base32.
+ */
+function encodeZBase32(data) {
+  if (data.length === 0) {
+    return "";
+  }
+  const ALPHABET = "ybndrfg8ejkmcpqxot1uwisza345h769";
+  const SHIFT = 5;
+  const MASK = 31;
+  let buffer = data[0];
+  let index = 1;
+  let bitsLeft = 8;
+  let result = '';
+  while (bitsLeft > 0 || index < data.length) {
+    if (bitsLeft < SHIFT) {
+      if (index < data.length) {
+        buffer <<= 8;
+        buffer |= data[index++] & 0xff;
+        bitsLeft += 8;
+      } else {
+        const pad = SHIFT - bitsLeft;
+        buffer <<= pad;
+        bitsLeft += pad;
+      }
+    }
+    bitsLeft -= SHIFT;
+    result += ALPHABET[MASK & (buffer >> bitsLeft)];
+  }
+  return result;
 }
 
 export default WKD;

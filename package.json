@@ -30,6 +30,7 @@
     "mocha": "^8.3.0"
   },
   "dependencies": {
+    "@peculiar/webcrypto": "^1.1.6",
     "node-fetch": "^2.6.1"
   }
 }
