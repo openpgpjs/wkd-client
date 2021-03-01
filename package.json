@@ -12,7 +12,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/wkd.js"
+    "test": "mocha test/wkd.js",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "repository": {
     "type": "git",
