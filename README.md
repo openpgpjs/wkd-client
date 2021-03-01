@@ -11,11 +11,11 @@ import { readKey } from 'openpgp';
 
 (async () => {
   const wkd = new WKD();
-  const publicKey = await wkd.lookup({
+  const publicKeyBytes = await wkd.lookup({
     email: 'alice@example.com'
   });
   const publicKey = await readKey({
-    binaryKey: publicKey
+    binaryKey: publicKeyBytes
   });
 })();
 ```
