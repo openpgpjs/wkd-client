@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "A client for the Web Key Directory (WKD) protocol in order to lookup keys on designated servers.",
   "main": "src/wkd.js",
+  "browser": {
+    "node-fetch": false,
+    "crypto": false,
+    "@peculiar/webcrypto": false
+  },
   "directories": {
     "test": "test"
   },
