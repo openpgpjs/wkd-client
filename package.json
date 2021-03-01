@@ -12,7 +12,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --require esm test/wkd.js"
+    "test": "mocha test/wkd.js"
   },
   "repository": {
     "type": "git",
@@ -31,7 +31,6 @@
   "homepage": "https://github.com/openpgpjs/wkd-client#readme",
   "devDependencies": {
     "chai": "^4.3.0",
-    "esm": "^3.2.25",
     "mocha": "^8.3.0"
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-const WKD = require('..').default;
+const WKD = require('..');
 
 const chai = require('chai');
 

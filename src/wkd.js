@@ -108,4 +108,4 @@ function encodeZBase32(data) {
   return result;
 }
 
-export default WKD;
+module.exports = WKD;
