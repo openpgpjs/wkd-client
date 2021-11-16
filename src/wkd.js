@@ -51,9 +51,10 @@ class WKD {
     const localPartEncoded = new TextEncoder().encode(localPart.toLowerCase());
     const localPartHashed = new Uint8Array(await this._subtle.digest('SHA-1', localPartEncoded));
     const localPartBase32 = encodeZBase32(localPartHashed);
+    const localPartEscaped = encodeURIComponent(localPart);
 
-    const urlAdvanced = `https://openpgpkey.${domain}/.well-known/openpgpkey/${domain}/hu/${localPartBase32}`;
-    const urlDirect = `https://${domain}/.well-known/openpgpkey/hu/${localPartBase32}`;
+    const urlAdvanced = `https://openpgpkey.${domain}/.well-known/openpgpkey/${domain}/hu/${localPartBase32}?l=${localPartEscaped}`;
+    const urlDirect = `https://${domain}/.well-known/openpgpkey/hu/${localPartBase32}?l=${localPartEscaped}`;
 
     let response;
     try {
