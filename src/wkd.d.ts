@@ -1,4 +1,4 @@
-export class WKD {
+export default class WKD {
   constructor();
-  public async lookup(options: { email: string }): Uint8Array;
+  public lookup(options: { email: string }): Promise<Uint8Array>;
 }
