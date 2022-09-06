@@ -1,6 +1,6 @@
 {
   "name": "@openpgp/wkd-client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A client for the Web Key Directory (WKD) protocol in order to lookup keys on designated servers.",
   "main": "src/wkd.js",
   "browser": {
