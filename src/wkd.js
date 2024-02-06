@@ -15,6 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+// inspired by `is-html`
+// <https://github.com/sindresorhus/is-html/blob/bc57478683406b11aac25c4a7df78b66c42cc27c/index.js#L1-L11>
+const basic = /\s?<!doctype html>|(<html\b[^>]*>|<body\b[^>]*>|<x-[^>]+>)+/i;
+
 /**
  * This class implements a client for the Web Key Directory (WKD) protocol
  * in order to lookup keys on designated servers.
@@ -69,7 +73,20 @@ class WKD {
       }
     }
 
-    return new Uint8Array(await response.arrayBuffer());
+    const uint8Array = new Uint8Array(await response.arrayBuffer())
+
+    if (response.headers.get('content-type') === 'text/html') {
+      throw new Error('Invalid WKD lookup result (text/html Content-Type header)');
+    }
+
+    // inspired by `is-html`
+    // <https://github.com/sindresorhus/is-html/blob/bc57478683406b11aac25c4a7df78b66c42cc27c/index.js#L1-L11>
+    const str = new TextDecoder().decode(uint8Array);
+    if (str && basic.test(str.trim().slice(0, 1000))) {
+      throw new Error('Invalid WKD lookup result (HTML content detected)');
+    }
+
+    return uint8Array;
   }
 }
 
