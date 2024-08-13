@@ -75,10 +75,6 @@ class WKD {
 
     const uint8Array = new Uint8Array(await response.arrayBuffer())
 
-    if (response.headers.get('content-type') === 'text/html') {
-      throw new Error('Invalid WKD lookup result (text/html Content-Type header)');
-    }
-
     // inspired by `is-html`
     // <https://github.com/sindresorhus/is-html/blob/bc57478683406b11aac25c4a7df78b66c42cc27c/index.js#L1-L11>
     const str = new TextDecoder().decode(uint8Array);
