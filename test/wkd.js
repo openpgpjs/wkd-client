@@ -29,6 +29,16 @@ describe('WKD unit tests', function() {
         expect(error.message).to.equal('Direct WKD lookup failed: Not Found')
       });
     });
+
+    it('by email address should not work on invalid website', function() {
+      return wkd.lookup({
+        email: 'beep@boop.com'
+      }).then(function() {
+        throw new Error('Lookup should throw an error');
+      }).catch(function(error) {
+        expect(error.message).to.equal('Invalid WKD lookup result (text/html Content-Type header)');
+      });
+    });
   });
 
 });
